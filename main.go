@@ -4,52 +4,49 @@ import (
 	"bufio"
 	"fmt"
 	"go/build"
+	"io"
 	"os"
 	"runtime"
-	"strings"
 
 	"github.com/logrusorgru/aurora"
 )
 
-func main() {
-	info()
 
-	reader := reader()
-	loops := 0
+func init() {
+	printInfo()
+	variables = make(map[string]interface{})
+	constants = make(map[string]interface{})
+	functions = make(map[string]func())
+	types = make(map[string]bool)
+}
+
+func main() {
+	reader := reader(os.Stdin)
+	loops := 1
 loop:
 	for {
 		fmt.Print(fmt.Sprintf("go(%v)> ", loops))
 		txt, _ := reader.ReadString('\n')
-		if shouldExit(replace(txt)) {
+		rTxt := replace(txt)
+		if shouldExit(rTxt) {
 			break loop
 		}
-		loops ++
-		if replace(txt) == "" {
-			fmt.Println(aurora.Magenta("nil"))
-		}
+		loops++
+		Evaluate(rTxt)
 	}
 }
 
-func info() {
-	fmt.Println("Burrow Interactive Go REPL v 0.1\n")
+func printInfo() {
 	fmt.Println(
-		fmt.Sprintf("Version [%s] Root [%s] Path [%s]",
-			runtime.Version(),
-			runtime.GOROOT(),
-			build.Default.GOPATH))
+		fmt.Sprintf("Go Version [%v] GOROOT [%v] GOPATH [%v]",
+			aurora.BrightMagenta(runtime.Version()),
+			aurora.BrightMagenta(runtime.GOROOT()),
+			aurora.BrightMagenta(build.Default.GOPATH)))
+	fmt.Println("Burrow Interactive Go REPL v 0.1 - type \"exit\" to quit\n")
 }
 
-func reader() *bufio.Reader {
-	return bufio.NewReader(os.Stdin)
+func reader(r io.Reader) *bufio.Reader {
+	return bufio.NewReader(r)
 }
 
-func shouldExit(txt string) bool {
-	if strings.Compare("exit", txt) == 0 {
-		return true
-	}
-	return false
-}
 
-func replace(txt string) string {
-	return strings.Replace(txt, "\n", "", -1)
-}
