@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/logrusorgru/aurora"
 )
@@ -11,13 +12,29 @@ import (
 func ParseArithmetic(num float64, args []string) {
 
 	if len(args) == 0 {
-		fmt.Println(aurora.BrightCyan(fmt.Sprintf("%v: %T", num, num)))
+		fmt.Println(aurora.BrightCyan(fmt.Sprintf("%v", num)))
 		return
+	}
+
+
+	arops := make(map[string]int)
+	for _, item := range args {
+		if item == "+" || item == "-" || item == "*" || item == "%" || item == "/" {
+			_, exist := arops[item]
+			if exist {
+				arops[item]++
+			} else {
+				arops[item] = 1
+			}
+		}
+
 	}
 
 	switch args[0] {
 	case "+":
-		fmt.Println("Addition")
+		f, _ := strconv.ParseFloat(args[1], 64)
+		fmt.Println(aurora.BrightCyan(add(num, f)))
+		return
 	case "-":
 		//
 	case"*":
@@ -35,7 +52,7 @@ func ParseArithmetic(num float64, args []string) {
 	}
 }
 
-func add(one, two int) int {
+func add(one, two float64) float64 {
 	return one + two
 }
 

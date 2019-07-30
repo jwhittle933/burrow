@@ -24,6 +24,8 @@ var (
 	constants map[string]interface{}
 	functions map[string]func()
 	types     []string
+
+	logger *Log
 )
 
 func init() {
@@ -32,6 +34,7 @@ func init() {
 	constants = make(map[string]interface{})
 	functions = make(map[string]func())
 	types = []string{"bool", "byte", "complex128", "complex64", "error", "float32", "float64", "int", "int16", "int32", "int64", "int8", "rune", "string", "uint", "uint16", "uint32", "uint64", "uint8", "uintptr"}
+	logger = StartLog()
 }
 
 func main() {

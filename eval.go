@@ -57,14 +57,15 @@ func Evaluate(txt ReadLine) {
 		return
 	default:
 		// check for arithmetic and perform operation
-		if num, err := strconv.ParseFloat(getNumeric(args[0]), 64); err == nil {
+		if num, err := strconv.ParseFloat(args[0], 64); err == nil {
 			ParseArithmetic(num, args[1:])
 			return
 		}
 
 		// check for variable refernce operations, i.e. string concat, arithmetic, etc.
 
-		fmt.Println(aurora.Red(fmt.Sprintf("Unknown reference %s", args[0])))
+		// fmt.Println(aurora.Red(fmt.Sprintf("Unexpected %s", args[0])))
+		logger.W("Unexpected %s", args[0])
 		return
 	}
 }
@@ -72,6 +73,7 @@ func Evaluate(txt ReadLine) {
 func getNumeric(txt string) string {
 	// strip off ++ or -- from string (or any other non-numeric value)
 	// if variable name contains numeric, func will fail
+	// also strips out decimals
 	reg, _ := regexp.Compile("[^0-9]+")
 	return reg.ReplaceAllString(txt, "")
 }
