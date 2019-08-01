@@ -24,9 +24,12 @@ func Assign(name string, args []string) {
 		return
 	}
 
-	// set variable to nil value
-	// TODO: associate var, nil value, and type
-	variables[name] = nil
+	// set variable to zero value according to type
+	// may need to change type to map[string]interface{} for type assertion
+	variables[name] = map[string]string{
+		"value": "",
+		"type": args[0],
+	}
 }
 
 func isType(t string) bool {
@@ -41,12 +44,22 @@ func isType(t string) bool {
 // AssignC ...
 func AssignC(name string, args []string) {
 	if isConst := constants[name]; isConst != nil {
-		fmt.Println(aurora.Red(fmt.Sprintf("%s is already a constant", name)))
+		logger.E("%s is already a constat", name)
 		return
 	}
 
 	constants[name] = map[string]string{
 		"value": args[2],
 		"type":  args[0],
+	}
+
+	fmt.Println(aurora.BrightBlue(constants[name].(map[string]string)["value"]))
+}
+
+// ReAssign ...
+func ReAssign(name string, args []string) {
+	variables[name] = map[string]string{
+		"value": args[1],
+		"type": "string",
 	}
 }
