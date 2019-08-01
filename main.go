@@ -14,13 +14,6 @@ import (
 
 var (
 	variables map[string]interface{}
-	// constants:
-	// c := map[string]map[string]string{
-	//      "test": map[string]string{
-	//            "value": "hello",
-	//            "type": "string",
-	//      }
-	// }
 	constants map[string]interface{}
 	functions map[string]func()
 	types     []string
@@ -45,25 +38,36 @@ app:
 		fmt.Print(fmt.Sprintf("go(%v)> ", loops))
 		rTxt := NewReadLine(reader.ReadString('\n'))
 
+		// if text == "exit", break loop and exit
 		if shouldExit(rTxt.toString()) {
 			break app
 		}
 
+		// check for empty string -> print "nil"
 		if rTxt.toString() == "" {
 			fmt.Println(aurora.Magenta("nil"))
 			continue app
 		}
 
+		// check is first token is var name -> find and print value
 		if storedVar := checkVar(rTxt.toString()); storedVar != nil {
+			v := storedVar.(map[string]string)["value"]
+			// check is var declared but empty, i.e., var x string -> print "nil"
+			if v == "" {
+				fmt.Println(aurora.Magenta("nil"))
+				continue app
+			}
 			fmt.Println(aurora.BrightGreen(storedVar.(map[string]string)["value"]))
 			continue app
 		}
 
+		// check if first token is const name -> print value
 		if storedConst := checkConst(rTxt.toString()); storedConst != nil {
 			fmt.Println(aurora.BrightGreen(storedConst.(map[string]string)["value"]))
 			continue app
 		}
 
+		// otherwise, evalute string
 		Evaluate(rTxt)
 		loops++
 	}

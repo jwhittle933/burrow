@@ -7,8 +7,6 @@ import (
 	"strings"
 	"strconv"
 	"os"
-
-	"github.com/logrusorgru/aurora"
 )
 
 // ReadLine ...
@@ -17,18 +15,19 @@ type ReadLine string
 // NewReadLine ...
 func NewReadLine(txt string, err error) ReadLine {
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Error reading input; %s", aurora.Red(err.Error())))
+		logger.E("Error reading input: %s", err.Error())
 		os.Exit(1)
 	}
-	return ReadLine(strings.Replace(txt, "\n", "", -1))
+	return ReadLine(strings.Replace(txt, "\n", "", -1)).trimWhite()
 }
 
 func (r ReadLine) toString() string {
 	return string(r)
 }
 
-func (r ReadLine) whitespace() {
-	//
+func (r ReadLine) trimWhite() ReadLine {
+	s := strings.TrimSpace(r.toString())
+	return ReadLine(s)
 }
 
 // Evaluate ...
@@ -58,23 +57,30 @@ func Evaluate(txt ReadLine) {
 		AssignC(args[1], args[2:])
 	case "import":
 		return
-	case "pacakge":
+	case "package":
+		logger.W("Packages are not supported in the REPL")
 		return
 	default:
-		// check for arithmetic and perform operation
+		// check for numeric string and parse ensuing operations
 		if num, err := strconv.ParseFloat(args[0], 64); err == nil {
 			ParseArithmetic(num, args[1:])
 			return
 		}
 
-		// increment and decrement operations may not have a space
+		// increment and decrement operations do not have a space
 		// after the initial integer, i.e., 10++
 		// Check for "n++" or "n--" pattern and execute operation
 		// if value is a inc. or dec. variable, i.e., x++,
 		// isIncDecOp will return error and block will be skipped
+		// TODO: allow for inc/dec of variables
 		if num, op, err := isIncDecOp(args[0]); err == nil {
 			num, _ := strconv.ParseFloat(num, 64)
 			ParseArithmetic(num, op)
+			return
+		}
+
+		if isReassign(args) {
+			ReAssign(args[0], args[1:])
 			return
 		}
 
@@ -106,6 +112,19 @@ func isIncDecOp(txt string) (string, []string, error) {
 	}
 
 	return n[0], op, nil
+}
+
+func isReassign(a []string) bool{
+	if len(a) < 2 {
+		return false
+	}
+	if a[1] == "=" {
+		if variables[a[0]] != nil || constants[a[0]] != nil {
+			return true
+		}
+		return false
+	}
+	return false
 }
 
 func evalFunction(txt ReadLine) {
