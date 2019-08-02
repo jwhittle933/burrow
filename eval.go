@@ -92,14 +92,6 @@ func Evaluate(txt ReadLine) {
 	}
 }
 
-// func isArithmetic(txt string) {
-// 	regNum, _ := regexp.Compile(`[0-9].`)
-// 	ar, _ := regexp.Compile("[-|+|*|/|%]")
-
-// 	n := regNum.FindAllString(txt, -1)
-// 	op := ar.FindAllString(txt, -1)
-// }
-
 func isIncDecOp(txt string) (string, []string, error) {
 	// if variable name contains numeric, func will fail
 	// also strips out decimals
