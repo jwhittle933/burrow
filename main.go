@@ -35,7 +35,7 @@ func main() {
 	loops := 1
 app:
 	for {
-		fmt.Print(fmt.Sprintf("go(%v)> ", loops))
+		fmt.Print(fmt.Sprintf("burrow(%v)> ", loops))
 		rTxt := NewReadLine(reader.ReadString('\n'))
 
 		// if text == "exit", break loop and exit
@@ -79,7 +79,7 @@ func printInfo() {
 			aurora.BrightMagenta(runtime.Version()),
 			aurora.BrightMagenta(runtime.GOROOT()),
 			aurora.BrightMagenta(build.Default.GOPATH)))
-	fmt.Println("Burrow Interactive Go REPL v 0.1 - type \"exit\" to quit\n")
+	fmt.Println("Burrow Interactive Go REPL v 0.1 - type \"exit\" to quit")
 }
 
 func reader(r io.Reader) *bufio.Reader {
